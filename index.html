@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyWay Vertiports — The Ground Layer for Advanced Air Mobility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #0a141d;
+    --navy: #12253600;
+    --navy-solid: #142a3b;
+    --horizon: #e28b3d;
+    --ember: #c9642a;
+    --saguaro: #4f7a61;
+    --saguaro-dim: #375a48;
+    --sand: #f4efe4;
+    --steel: #9fb2c0;
+    --line: rgba(244,239,228,0.14);
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Source Serif 4', serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--sand);
+    font-family:var(--body);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  a{color:inherit;}
+  img,video{display:block;max-width:100%;}
+
+  /* ---------- NAV ---------- */
+  .navbar{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 5vw;
+    transition:background .4s ease, padding .4s ease, border-color .4s ease;
+    border-bottom:1px solid transparent;
+  }
+  .navbar.scrolled{
+    background:rgba(10,20,29,0.86);
+    backdrop-filter:blur(10px);
+    padding:14px 5vw;
+    border-color:var(--line);
+  }
+  .navmark{ display:flex; align-items:center; }
+  .navmark img{
+    height:28px; width:auto; display:block;
+    transition:height .4s ease;
+  }
+  .navbar.scrolled .navmark img{ height:24px; }
+  .navlinks{ display:flex; gap:2.4rem; font-family:var(--mono); font-size:0.72rem;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--steel);
+  }
+  .navlinks a{ text-decoration:none; transition:color .25s ease; }
+  .navlinks a:hover{ color:var(--horizon); }
+  @media (max-width:720px){
+    .navbar{ flex-direction:column; align-items:flex-start; gap:8px; }
+    .navlinks{ gap:1.2rem; font-size:0.64rem; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative; height:100vh; min-height:560px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    overflow:hidden;
+  }
+  @supports (height: 100svh){ .hero{ height:100svh; } }
+  .hero-media{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; object-position:center 62%;
+    z-index:0;
+  }
+  .hero-scrim{
+    position:absolute; inset:0; z-index:1;
+    background:
+      linear-gradient(180deg, rgba(8,15,22,0.55) 0%, rgba(8,15,22,0.15) 30%, rgba(8,15,22,0.35) 60%, rgba(6,12,18,0.92) 100%);
+  }
+  .hud{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    padding:100px 5vw 0;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    font-family:var(--mono); font-size:0.68rem; letter-spacing:0.08em;
+    color:rgba(244,239,228,0.55); text-transform:uppercase;
+  }
+  .hud .corner{ position:relative; padding-top:14px; }
+  .hud .corner::before{
+    content:""; position:absolute; top:0; left:0; width:22px; height:22px;
+    border-top:1px solid rgba(226,139,61,0.6); border-left:1px solid rgba(226,139,61,0.6);
+  }
+  .hud .corner.right{ text-align:right; padding-right:14px; }
+  .hud .corner.right::before{ left:auto; right:0; border-left:none; border-right:1px solid rgba(226,139,61,0.6); }
+
+  .hero-content{
+    position:relative; z-index:3;
+    padding:0 5vw 9vh;
+    max-width:1100px;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:0.75rem; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--horizon); margin-bottom:22px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .eyebrow::before{
+    content:""; width:34px; height:1px; background:var(--horizon);
+  }
+  .hero-title{
+    font-family:var(--display); font-weight:600;
+    font-size:clamp(2.6rem, 6.4vw, 5.4rem);
+    line-height:0.98; letter-spacing:-0.01em;
+    color:var(--sand);
+    margin-bottom:28px;
+  }
+  .hero-tagline{
+    font-family:var(--body); font-weight:400;
+    font-size:clamp(1rem, 1.35vw, 1.28rem);
+    max-width:640px; color:rgba(244,239,228,0.86);
+    font-style:italic;
+    border-left:2px solid var(--saguaro);
+    padding-left:20px;
+  }
+  .scroll-cue{
+    position:absolute; bottom:26px; left:5vw; z-index:3;
+    font-family:var(--mono); font-size:0.65rem; letter-spacing:0.16em;
+    color:var(--steel); text-transform:uppercase;
+    display:flex; align-items:center; gap:10px;
+  }
+  .scroll-cue .bar{ width:1px; height:30px; background:linear-gradient(var(--steel), transparent); }
+
+  /* ---------- SECTION SHELL ---------- */
+  section{ position:relative; padding:9vw 5vw; }
+  .divider{
+    height:1px; width:100%;
+    background:linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  }
+  .section-head{ max-width:760px; margin-bottom:4rem; }
+  .kicker{
+    font-family:var(--mono); font-size:0.72rem; letter-spacing:0.2em;
+    text-transform:uppercase; color:var(--saguaro);
+    margin-bottom:18px; display:flex; align-items:center; gap:12px;
+  }
+  .kicker::before{ content:""; width:26px; height:1px; background:var(--saguaro); }
+  h2{
+    font-family:var(--display); font-weight:600;
+    font-size:clamp(1.9rem, 3.6vw, 3.1rem);
+    letter-spacing:-0.01em; color:var(--sand); line-height:1.08;
+  }
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease; }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+
+  /* ---------- VISION SECTION ---------- */
+  .vision{ background:var(--navy-solid); }
+  .vision-grid{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:5vw; align-items:center;
+  }
+  .vision-copy p{ font-size:1.12rem; color:rgba(244,239,228,0.9); max-width:520px; }
+  .vision-copy p + p{ margin-top:1.4rem; }
+  .vision-copy .lede{
+    font-family:var(--body); font-style:italic; font-size:1.28rem;
+    color:var(--sand); margin-bottom:1.8rem; max-width:540px;
+  }
+  .vision-photo{ position:relative; border-radius:2px; overflow:hidden; }
+  .vision-photo img{ width:100%; height:100%; object-fit:cover; filter:saturate(1.02); }
+  .vision-photo::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, transparent 60%, rgba(10,20,29,0.55) 100%);
+  }
+  .pillars{
+    margin-top:5rem; display:grid; grid-template-columns:repeat(3, 1fr); gap:2.5rem;
+    border-top:1px solid var(--line); padding-top:3rem;
+  }
+  .pillar .tag{
+    font-family:var(--mono); font-size:0.68rem; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--horizon); margin-bottom:0.9rem;
+  }
+  .pillar h3{
+    font-family:var(--display); font-weight:500; font-size:1.18rem;
+    color:var(--sand); margin-bottom:0.7rem;
+  }
+  .pillar p{ font-size:0.98rem; color:var(--steel); }
+  @media (max-width:900px){
+    .vision-grid{ grid-template-columns:1fr; }
+    .pillars{ grid-template-columns:1fr; gap:2.2rem; }
+    .vision-photo{ order:-1; aspect-ratio:16/10; }
+  }
+
+  /* ---------- LEADERSHIP ---------- */
+  .leadership{ background:var(--ink); }
+  .lead-quote{
+    font-family:var(--body); font-style:italic;
+    font-size:clamp(1.2rem, 2vw, 1.6rem);
+    color:var(--sand); max-width:880px; line-height:1.5;
+    border-left:2px solid var(--horizon); padding-left:26px;
+    margin-bottom:4.5rem;
+  }
+  .profile{
+    display:grid; grid-template-columns:0.75fr 1.6fr; gap:4vw;
+    border-top:1px solid var(--line); padding-top:3.2rem;
+  }
+  .profile-id .portrait{
+    width:100%; aspect-ratio:3/4; overflow:hidden; border-radius:2px;
+    margin-bottom:1.6rem; position:relative;
+  }
+  .profile-id .portrait img{
+    width:100%; height:100%; object-fit:cover; filter:grayscale(0.15) contrast(1.03);
+  }
+  .profile-id .portrait::after{
+    content:""; position:absolute; inset:0;
+    box-shadow:inset 0 0 0 1px var(--line);
+    background:linear-gradient(180deg, transparent 70%, rgba(10,20,29,0.35) 100%);
+  }
+  .profile-id .name{
+    font-family:var(--display); font-weight:600; font-size:1.6rem; color:var(--sand);
+  }
+  .profile-id .role{
+    font-family:var(--mono); font-size:0.72rem; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--saguaro); margin-top:0.6rem; margin-bottom:1.8rem;
+  }
+  .stat-strip{ list-style:none; border-top:1px solid var(--line); }
+  .stat-strip li{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:0.7rem 0; border-bottom:1px solid var(--line);
+    font-family:var(--mono); font-size:0.72rem; letter-spacing:0.04em;
+    color:var(--steel); text-transform:uppercase;
+  }
+  .stat-strip li b{
+    font-family:var(--display); font-size:0.95rem; color:var(--sand);
+    letter-spacing:0; text-transform:none;
+  }
+  .bio p{ font-size:1.02rem; color:rgba(244,239,228,0.88); max-width:640px; }
+  .bio p + p{ margin-top:1.3rem; }
+  @media (max-width:900px){ .profile{ grid-template-columns:1fr; gap:2rem; } .profile-id .portrait{ max-width:280px; } }
+
+  /* ---------- CONTACT ---------- */
+  .contact{
+    background:
+      radial-gradient(120% 140% at 15% 0%, rgba(226,139,61,0.16) 0%, transparent 55%),
+      linear-gradient(180deg, var(--navy-solid) 0%, var(--ink) 100%);
+  }
+  .contact-inner{ max-width:820px; }
+  .contact p.lede{
+    font-size:1.15rem; color:rgba(244,239,228,0.9); max-width:640px; margin-bottom:2.6rem;
+  }
+  .contact-actions{ display:flex; flex-wrap:wrap; gap:1.2rem; margin-bottom:3.5rem; }
+  .btn{
+    font-family:var(--display); font-weight:500; font-size:0.95rem;
+    text-decoration:none; padding:16px 30px; border-radius:2px;
+    display:inline-flex; align-items:center; gap:10px;
+    transition:transform .25s ease, background .25s ease, border-color .25s ease;
+  }
+  .btn-primary{ background:var(--horizon); color:#0a141d; }
+  .btn-primary:hover{ background:#eea059; transform:translateY(-2px); }
+  .btn-secondary{ border:1px solid var(--line); color:var(--sand); }
+  .btn-secondary:hover{ border-color:var(--saguaro); color:var(--saguaro); transform:translateY(-2px); }
+  .contact-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:2rem;
+    border-top:1px solid var(--line); padding-top:2.6rem;
+  }
+  .contact-grid .tag{
+    font-family:var(--mono); font-size:0.68rem; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--steel); margin-bottom:0.6rem;
+  }
+  .contact-grid .val{ font-family:var(--display); font-size:1.02rem; color:var(--sand); }
+  @media (max-width:720px){ .contact-grid{ grid-template-columns:1fr; } }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding:2.4rem 5vw; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+    font-family:var(--mono); font-size:0.68rem; letter-spacing:0.04em; color:var(--steel);
+  }
+
+  /* ---------- SMALL SCREENS (phones) ---------- */
+  @media (max-width:720px){
+    .hud{ padding:118px 6vw 0; font-size:0.6rem; letter-spacing:0.06em; }
+    .hud .corner::before{ width:16px; height:16px; }
+    .hero-content{ padding:0 6vw 8vh; }
+    .hero-tagline{ padding-left:14px; }
+    section{ padding:16vw 6vw; }
+    .section-head{ margin-bottom:2.8rem; }
+    .lead-quote{ padding-left:18px; margin-bottom:3rem; }
+    .contact-actions{ flex-direction:column; }
+    .contact-actions .btn{ width:100%; justify-content:center; }
+    footer{ flex-direction:column; align-items:flex-start; }
+  }
+  @media (max-width:480px){
+    .hero-title{ font-size:2.4rem; }
+    .hud{ padding:112px 6vw 0; }
+    .stat-strip li{ font-size:0.64rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .reveal{ transition:none; opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="navmark">
+    <img src="skyway_logo_ow.png" alt="SkyWay Vertiports">
+  </div>
+  <div class="navlinks">
+    <a href="#vision">Vision</a>
+    <a href="#leadership">Leadership</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <video class="hero-media" autoplay muted loop playsinline poster="skyway_thefuture2.png">
+    <source src="skyway_thefuture.webm" type="video/mp4">
+  </video>
+  <div class="hero-scrim"></div>
+  <div class="hud">
+    <div class="corner">PHX METROPLEX<br>33.4484°N / 112.0740°W</div>
+    <div class="corner right">GROUND LAYER<br>AAM // eVTOL</div>
+  </div>
+  <div class="hero-content">
+    <div class="eyebrow">Advanced Air Mobility Infrastructure</div>
+    <h1 class="hero-title">SkyWay<br>Vertiports</h1>
+    <p class="hero-tagline">SkyWay Vertiports is designing a safe, scalable, open vertiport infrastructure network across the Phoenix Metroplex — engineered on proven heliport standards, innovated for aviation's next evolution.</p>
+  </div>
+  <div class="scroll-cue"><div class="bar"></div>Scroll</div>
+</section>
+
+<!-- VISION -->
+<section class="vision" id="vision">
+  <div class="section-head reveal">
+    <div class="kicker">The Ground Layer</div>
+    <!--<h2>To take off, an aircraft first needs a place to land.</h2>-->
+	<h2><i>"Takeoffs are optional. Landings are mandatory."</i></h2>
+	
+  </div>
+
+  <div class="vision-grid">
+    <div class="vision-copy reveal">
+      <p class="lede">To take off, an aircraft first needs a place to land. We are building those places.</p>
+      <p>SkyWay Vertiports is the forward-thinking ground layer that every eVTOL operator needs — a committed partner ensuring the safety, rapid turnaround, and customer support necessary for eVTOL transit through a definitive physical and digital backbone.</p>
+      <p>Across the Phoenix Metroplex, we're developing infrastructure that is platform-neutral by design — built to serve all eVTOL operators on equal terms, whether you are operating as an air taxi, air cargo, MEDIVAC, law enforcement, or privately owned.</p>
+    </div>
+    <div class="vision-photo reveal">
+      <img src="skyway_couple2.png" alt="Passengers arriving at a SkyWay vertiport at dusk">
+    </div>
+  </div>
+
+  <div class="pillars">
+    <div class="pillar reveal">
+      <div class="tag">Open Access</div>
+      <h3>Platform-neutral by design</h3>
+      <p>One network, every operator. SkyWay builds shared infrastructure rather than a proprietary network, so the market — not a single manufacturer — decides who flies.</p>
+    </div>
+    <div class="pillar reveal">
+      <div class="tag">Regulatory Fluency</div>
+      <h3>Fluent in the agencies that matter</h3>
+      <p>We speak the language of the regulators who will define this industry, because we've spent careers operating inside it.</p>
+    </div>
+    <div class="pillar reveal">
+      <div class="tag">Rotorwing Heritage</div>
+      <h3>Heliport standards, proven in service</h3>
+      <p>Vertiports engineered on the same rigor and precedent that already governs rotorwing operations — not reinvented, adapted.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- LEADERSHIP -->
+<section class="leadership" id="leadership">
+  <div class="section-head reveal">
+    <div class="kicker">Leadership</div>
+    <h2>Flight-test-grade judgment, applied to the ground.</h2>
+  </div>
+
+  <p class="lead-quote reveal">SkyWay Vertiports was founded to bring disciplined, flight-test ideology and engineering protocols from over a hundred years of aviation experience to the ground infrastructure side of advanced air mobility — treating vertiports with the same rigor the industry already applies to the aircraft themselves.</p>
+
+  <div class="profile reveal">
+    <div class="profile-id">
+      <div class="portrait"><img src="glausinbio.png" alt="Portrait of Greg Lausin"></div>
+      <div class="name">Greg Lausin</div>
+      <div class="role">President and Chief Executive Officer, Lausin Aerospace Consulting</div>
+      <!--<ul class="stat-strip">
+        <li><span>Flight Experience</span><b>36+ yrs</b></li>
+        <li><span>Aircraft Types</span><b>35+</b></li>
+        <li><span>Flight Test Leadership</span><b>22+ yrs</b></li>
+        <li><span>Flight Test School</span><b>USNTPS Grad</b></li>
+        <li><span>Business Education</span><b>MBA, 2019</b></li>
+      </ul>-->
+    </div>
+    <div class="bio">
+      <p>As an accomplished aviation executive, experimental test pilot, and program leader with more than 36 years of military and civilian flight experience across more than 35 rotary- and fixed-wing aircraft. Over the course of a distinguished career with the U.S. Army and Boeing, Greg has spent more than 22 years leading experimental and engineering flight-test efforts that advance aircraft performance, mission capability, and operational readiness.</p>
+      <p>A graduate of the prestigious United States Naval Test Pilot School, specializing in the integration, test, and evaluation of advanced rotary- and fixed-wing aircraft, aircraft systems, and mission-critical components. This expertise includes unmanned systems, manned-unmanned teaming, and complex system-of-systems integration for U.S. Government and international customers.</p>
+      <p>In addition to deep technical and operational expertise, earning an MBA from the University of Phoenix in 2019 brings strong business acumen and executive leadership capability. This combination of flight-test experience, engineering insight, and formal business education provides a bridge of technical complexity with strategic decision-making.</p>
+      <p>As an executive leader, with a proven record of defining, leading, and executing complex programs that deliver measurable business and mission success through cross-functional collaboration, and a results-driven approach, bring the credibility of a career aviator together with the strategic perspective required to lead high-performing teams and critical programs.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="section-head reveal" style="margin-bottom:1.5rem;">
+      <div class="kicker">Contact</div>
+      <h2>Let's build the ground layer together.</h2>
+    </div>
+    <p class="lede reveal">Whether you're an eVTOL manufacturer, a landowner, a utility, or an economic development authority — SkyWay is engaging now on siting, power, and regulatory pathways across the Phoenix Metroplex.</p>
+
+    <div class="contact-actions reveal">
+      <a class="btn btn-primary" href="mailto:info@skywayvertiports.com">Start the conversation</a>
+      <a class="btn btn-secondary" href="mailto:info@skywayvertiports.com">info@skywayvertiports.com</a>
+    </div>
+
+    <div class="contact-grid reveal">
+      <div>
+        <div class="tag">Headquarters</div>
+        <div class="val">Phoenix, Arizona</div>
+      </div>
+      <div>
+        <div class="tag">Service Area</div>
+        <div class="val">Phoenix Metroplex</div>
+      </div>
+      <div>
+        <div class="tag">Engaging On</div>
+        <div class="val">Siting · Power · Regulatory Pathways</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Lausin Aerospace Consulting, LLC, DBA SkyWay Vertiports. All rights reserved.</span>
+  <span>Phoenix, Arizona</span>
+</footer>
+
+<script>
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive:true });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  }, { threshold:0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
