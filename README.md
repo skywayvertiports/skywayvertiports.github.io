@@ -1,4 +1,4 @@
-## Hi there 👋
+## Hey! 👋 We're developing vertiports for eVTOL traffic in the Phoenix metro, in the USA. We aim to support any eVTOL (that can get FAA certification of course). We're dedicated to making this a green project. 
 
 <!--
 **skywayvertiports/skywayvertiports** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
